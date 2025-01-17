@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Operations</RootNamespace>
+    <TargetFrameworks>net8.0;net48</TargetFrameworks>
+    <Authors>magbender</Authors>
+    <Company>Conteage</Company>
+    <Description>A .NET Core library for defining and executing operations and processes on documents.</Description>
+    <Copyright>Conteage Corp</Copyright>
+    <PackageReadmeFile></PackageReadmeFile>
+    <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+    <Title>Ecmg.Operations</Title>
+    <Version>1.0.6</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Operations\Action Operations\SendMessageOperation.vb" />
+    <Compile Remove="Operations\Decision Operations\IsPdfDecisionOperation.vb" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Ecmg.Documents" Version="1.0.10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="README.md">
+      <PackagePath>\</PackagePath>
+      <Pack>True</Pack>
+    </None>
+  </ItemGroup>
+
+</Project>
