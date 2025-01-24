@@ -21,6 +21,8 @@ Imports Documents.Exceptions
 Imports Documents.Extensions
 Imports Documents.SerializationUtilities
 Imports Documents.Utilities
+Imports Newtonsoft.Json
+
 
 #End Region
 
@@ -1001,9 +1003,10 @@ Namespace Extensions
 
     Public Function ToJson() As String Implements IOperable.ToJson
       Try
-
+        Return WriteJsonString()
       Catch ex As Exception
         ApplicationLogging.LogException(ex, Reflection.MethodBase.GetCurrentMethod)
+        ' Re-throw the exception to the caller
         Throw
       End Try
     End Function
@@ -1031,6 +1034,16 @@ Namespace Extensions
     Public Function ToXmlString() As String Implements IOperable.ToXmlElementString
       Try
         Return Serializer.Serialize.XmlElementString(Me)
+      Catch ex As Exception
+        ApplicationLogging.LogException(ex, Reflection.MethodBase.GetCurrentMethod)
+        ' Re-throw the exception to the caller
+        Throw
+      End Try
+    End Function
+
+    Friend Function WriteJsonString() As String
+      Try
+        Return JsonConvert.SerializeObject(Me, Newtonsoft.Json.Formatting.None, New OperationJsonConverter())
       Catch ex As Exception
         ApplicationLogging.LogException(ex, Reflection.MethodBase.GetCurrentMethod)
         ' Re-throw the exception to the caller

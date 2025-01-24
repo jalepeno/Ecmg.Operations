@@ -123,7 +123,13 @@ Public Class ProcessJsonConverter
               Case "parameters"
                 lobjParameters.Add(Parameter.CreateFromJsonReader(reader))
               Case "operations"
-                lobjOperations.Add(Operation.CreateFromJsonReader(reader))
+                Dim lobjOperation As IOperation = Operation.CreateFromJsonReader(reader)
+                If lobjOperation IsNot Nothing Then
+                  lobjOperations.Add(lobjOperation)
+                Else
+                  Throw New InvalidOperationException()
+                End If
+
             End Select
 
         End Select

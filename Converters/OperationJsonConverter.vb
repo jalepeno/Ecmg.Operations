@@ -134,6 +134,8 @@ Public Class OperationJsonConverter
                 .Parameters = lobjParameters
               End With
               Return lobjOperation
+            Else
+              Throw New UnknownOperationException(lstrOperationName)
             End If
         End Select
       End While

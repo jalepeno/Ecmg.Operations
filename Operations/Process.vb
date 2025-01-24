@@ -14,6 +14,7 @@
 
 Imports System.ComponentModel
 Imports System.Globalization
+Imports System.Security.Cryptography
 Imports System.Text
 Imports System.Text.RegularExpressions
 Imports System.Xml
@@ -681,6 +682,30 @@ Public Class Process
   Public Overloads Function ToString() As String Implements IOperable.ToString
     Try
       Return DebuggerIdentifier()
+    Catch ex As Exception
+      ApplicationLogging.LogException(ex, Reflection.MethodBase.GetCurrentMethod)
+      ' Re-throw the exception to the caller
+      Throw
+    End Try
+  End Function
+
+  Public Shared Function FromXml(lpProcessXml As String) As Process
+
+    Dim lstrErrorMessage As String = String.Empty
+    Dim lobjProcess As IProcess = Nothing
+    Try
+
+      lobjProcess = Serializer.Deserialize.XmlString(lpProcessXml, GetType(Process))
+
+      If lobjProcess Is Nothing Then
+        ' Check the error message
+        If lstrErrorMessage.Length > 0 Then
+          Throw New Exception(lstrErrorMessage)
+        End If
+      End If
+
+      Return lobjProcess
+
     Catch ex As Exception
       ApplicationLogging.LogException(ex, Reflection.MethodBase.GetCurrentMethod)
       ' Re-throw the exception to the caller
@@ -1443,7 +1468,7 @@ Public Class Process
     End Try
   End Function
 
-  Public Function Deserialize(ByVal lpXML As System.Xml.XmlDocument) As Object Implements ISerialize.DeSerialize
+  Public Function Deserialize(ByVal lpXML As System.Xml.XmlDocument) As Object Implements ISerialize.Deserialize
     Try
 
 #If NET8_0_OR_GREATER Then
@@ -1624,6 +1649,8 @@ Public Class Process
   End Function
 
 #Region "IXmlSerializable Implementation"
+
+
 
   Public Function GetSchema() As System.Xml.Schema.XmlSchema Implements System.Xml.Serialization.IXmlSerializable.GetSchema
     ' As per the Microsoft guidelines this is not implemented
