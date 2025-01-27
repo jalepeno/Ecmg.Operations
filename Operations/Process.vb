@@ -1374,6 +1374,16 @@ Public Class Process
       ' Initialize the detailed results
       mobjResultDetails = New ProcessResult(Me)
 
+      If WorkItem.ProcessedStatus = ProcessedStatus.NotProcessed Then
+        Select Case Result
+          Case Result.Failed
+            WorkItem.ProcessedStatus = ProcessedStatus.Failed
+          Case Result.Success
+            WorkItem.ProcessedStatus = ProcessedStatus.Success
+        End Select
+      End If
+
+
       ' Make sure we dispose of the document attachment to release any associated memory
       If Me.WorkItem IsNot Nothing AndAlso Me.WorkItem.Document IsNot Nothing AndAlso Me.WorkItem.Document.IsDisposed = False Then
         Me.WorkItem.Document.Dispose()
