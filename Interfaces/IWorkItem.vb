@@ -49,4 +49,12 @@ Public Interface IWorkItem
   Function Execute(lpProcess As IOperable) As Boolean
   Function ToJsonString(lpIncludeProcessResult As Boolean) As String
 
+  ''' <summary>
+  ''' Raised when the Document property is set
+  ''' </summary>
+  ''' <param name="sender"></param>
+  ''' <param name="e"></param>
+  ''' <remarks></remarks>
+  Event DocumentAdded As EventHandler(Of OperableEventArgs)
+
 End Interface

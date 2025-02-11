@@ -1,0 +1,1 @@
+Ecmg.Operations.dll is a .NET Core library for defining operations and processes to perform on documents. These operations may be composed into complex processes, such as migrations. It is a free version of a portion of the Content Transformation Services framework.

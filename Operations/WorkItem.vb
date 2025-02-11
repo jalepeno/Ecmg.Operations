@@ -17,6 +17,7 @@ Imports System.IO
 Imports System.Text
 Imports System.Xml
 Imports System.Xml.Serialization
+Imports Azure.Core.HttpHeader
 Imports Documents.Core
 Imports Documents.SerializationUtilities
 Imports Documents.Utilities
@@ -25,6 +26,7 @@ Imports Newtonsoft.Json
 
 #End Region
 
+<DebuggerDisplay("{DebuggerIdentifier(),nq}")>
 Public Class WorkItem
   Implements IWorkItem
   Implements IDisposable
@@ -132,6 +134,38 @@ Public Class WorkItem
 
 #End Region
 
+#Region "Protected Methods"
+
+  Protected Friend Overridable Function DebuggerIdentifier() As String
+    Dim lobjIdentifierBuilder As New Text.StringBuilder
+    Try
+
+      If Not String.IsNullOrEmpty(Id) Then
+        lobjIdentifierBuilder.AppendFormat("{0}", Id)
+      Else
+        lobjIdentifierBuilder.AppendFormat("{0}", SourceDocId)
+      End If
+
+      If Not String.IsNullOrEmpty(DestinationDocId) Then
+        lobjIdentifierBuilder.AppendFormat(": {0}", DestinationDocId)
+      End If
+
+      lobjIdentifierBuilder.AppendFormat(": {0}", ProcessedStatus)
+
+      If Not String.IsNullOrEmpty(ProcessedBy) Then
+        lobjIdentifierBuilder.AppendFormat("-({0})", ProcessedBy)
+      End If
+
+      Return lobjIdentifierBuilder.ToString
+
+    Catch ex As Exception
+      ApplicationLogging.LogException(ex, Reflection.MethodBase.GetCurrentMethod)
+      Return lobjIdentifierBuilder.ToString
+    End Try
+  End Function
+
+#End Region
+
 #Region "Private Properties"
 
   Protected ReadOnly Property IsDisposed() As Boolean
@@ -165,8 +199,11 @@ Public Class WorkItem
     End Get
     Set(value As Document)
       mobjDocument = value
+      RaiseEvent DocumentAdded(Me, New OperableEventArgs(Process, Me))
     End Set
   End Property
+
+  Public Event DocumentAdded As EventHandler(Of OperableEventArgs) Implements IWorkItem.DocumentAdded
 
   Public Property Folder As Folder Implements IWorkItem.Folder
     Get
@@ -405,6 +442,83 @@ Public Class WorkItem
 
           .WritePropertyName("TotalProcessingTime")
           .WriteValue(lpWorkItem.TotalProcessingTime.ToString)
+
+          .WritePropertyName("ProcessedBy")
+          .WriteValue(lpWorkItem.ProcessedBy)
+
+          .WritePropertyName("CreateDate")
+          .WriteValue(lpWorkItem.CreateDate.ToString)
+
+          .WriteEndObject()
+          .WriteRaw("}")
+        End With
+      End Using
+
+      Return lobjStringBuilder.ToString
+
+    Catch ex As Exception
+      ApplicationLogging.LogException(ex, Reflection.MethodBase.GetCurrentMethod)
+      ' Re-throw the exception to the caller
+      Throw
+    End Try
+  End Function
+
+  Public Shared Function ToAbbreviatedJsonString(ByVal lpWorkItem As IWorkItem) As String
+    Try
+      ' We will do manual JSON serialization for complete speed and control
+
+      Dim lobjStringBuilder As New StringBuilder
+      Dim lobjStringWriter As New StringWriter(lobjStringBuilder)
+
+      Using lobjJSONWriter As New JsonTextWriter(lobjStringWriter)
+        With lobjJSONWriter
+          .Formatting = Newtonsoft.Json.Formatting.Indented
+
+          .WriteRaw("{""WorkItem"": ")
+          .WriteStartObject()
+
+          .WritePropertyName("Id")
+          .WriteValue(lpWorkItem.Id)
+
+          .WritePropertyName("ParentId")
+          If lpWorkItem.Parent IsNot Nothing Then
+            .WriteValue(lpWorkItem.Parent.Id)
+          Else
+            .WriteNull()
+          End If
+
+          .WritePropertyName("Title")
+          .WriteValue(lpWorkItem.Title)
+
+          .WritePropertyName("SourceDocId")
+          .WriteValue(lpWorkItem.SourceDocId)
+
+          .WritePropertyName("DestinationDocId")
+          .WriteValue(lpWorkItem.DestinationDocId)
+
+          '.WritePropertyName("ProcessedStatus")
+          '.WriteValue(lpWorkItem.ProcessedStatus.ToString)
+
+          'If lpIncludeProcessResult Then
+          '  .WritePropertyName("ProcessResult")
+          '  If lpWorkItem.ProcessResult IsNot Nothing Then
+          '    .WriteRawValue(lpWorkItem.ProcessResult.ToJsonString)
+          '  Else
+          '    .WriteNull()
+          '  End If
+          'End If
+
+          '.WritePropertyName("ProcessedMessage")
+          '.WriteValue(lpWorkItem.ProcessedMessage)
+
+          '.WritePropertyName("StartTime")
+          '.WriteValue(lpWorkItem.StartTime.ToString)
+
+          '.WritePropertyName("FinishTime")
+          '.WriteValue(lpWorkItem.FinishTime.ToString)
+
+          '.WritePropertyName("TotalProcessingTime")
+          '.WriteValue(lpWorkItem.TotalProcessingTime.ToString)
 
           .WritePropertyName("ProcessedBy")
           .WriteValue(lpWorkItem.ProcessedBy)

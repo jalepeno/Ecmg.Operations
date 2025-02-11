@@ -813,6 +813,10 @@ Public Class Process
   Public Event OperatingError(ByVal sender As Object, ByVal e As OperableErrorEventArgs) Implements IOperable.OperatingError
   Public Event ParameterPropertyChanged(sender As Object, e As PropertyChangedEventArgs) Implements IOperable.ParameterPropertyChanged
 
+  Public Event OperationBegin(ByVal sender As Object, ByVal e As OperableEventArgs) Implements IProcess.OperationBegin
+  Public Event OperationComplete(ByVal sender As Object, ByVal e As OperableEventArgs) Implements IProcess.OperationComplete
+  Public Event OperationError(ByVal sender As Object, ByVal e As OperableErrorEventArgs) Implements IProcess.OperationError
+
   Public Overridable Sub CheckParameters() Implements IOperable.CheckParameters
     Try
       ' Do Nothing
@@ -1075,7 +1079,9 @@ Public Class Process
         MobjCurrentOperation = lobjOperableStep
         lobjOperableStep.ProcessedMessage = String.Empty
         'LogSession.LogDebug("About to execute process operation '{0}'.", lobjOperableStep.Name)
+        RaiseEvent OperationBegin(Me, New OperableEventArgs(lobjOperableStep, WorkItem))
         lenuStepResult = lobjOperableStep.Execute(Me.WorkItem)
+        RaiseEvent OperationComplete(Me, New OperableEventArgs(lobjOperableStep, WorkItem))
         If lenuStepResult = OperationEnumerations.Result.Failed Then
           If Not String.IsNullOrEmpty(lobjOperableStep.ProcessedMessage) Then
             Me.ProcessedMessage = lobjOperableStep.ProcessedMessage
@@ -1383,6 +1389,7 @@ Public Class Process
         End Select
       End If
 
+      WorkItem.ProcessedBy = Environment.MachineName
 
       ' Make sure we dispose of the document attachment to release any associated memory
       If Me.WorkItem IsNot Nothing AndAlso Me.WorkItem.Document IsNot Nothing AndAlso Me.WorkItem.Document.IsDisposed = False Then

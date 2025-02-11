@@ -268,6 +268,75 @@ Public Class ProcessResult
     End Try
   End Function
 
+  Public Function ToAbbreviatedJsonString() As String
+    Try
+      ' We will do manual JSON serialization for complete speed and control
+
+      Dim lobjStringBuilder As New StringBuilder
+      Dim lobjStringWriter As New StringWriter(lobjStringBuilder)
+
+      Using lobjJSONWriter As New JsonTextWriter(lobjStringWriter)
+        With lobjJSONWriter
+          .Formatting = Newtonsoft.Json.Formatting.Indented
+
+          .WriteRaw("{""ProcessResult"": ")
+
+          .WriteStartObject()
+
+          .WritePropertyName("Name")
+          .WriteValue(Name)
+
+          .WritePropertyName("Scope")
+          .WriteValue(Scope.ToString)
+
+          .WritePropertyName("Result")
+          .WriteValue(Result.ToString)
+
+          .WritePropertyName("ProcessedMessage")
+          .WriteValue(ProcessedMessage)
+
+          .WritePropertyName("StartTime")
+          .WriteValue(StartTime.ToString)
+
+          .WritePropertyName("FinishTime")
+          .WriteValue(FinishTime.ToString)
+
+          .WritePropertyName("TotalProcessingTime")
+          .WriteValue(TotalProcessingTime.ToString)
+
+          .WritePropertyName("WorkItem")
+          If ((Parent IsNot Nothing) AndAlso (Parent.WorkItem IsNot Nothing)) Then
+            If TypeOf (Parent.WorkItem) Is WorkItem Then
+              .WriteRawValue(DirectCast(Parent.WorkItem, WorkItem).ToAbbreviatedJsonString(Parent.WorkItem))
+            End If
+
+          Else
+            .WriteNull()
+          End If
+
+          .WritePropertyName("OperationResults")
+          .WriteStartArray()
+          For Each lobjResult As IOperableResult In OperationResults
+            .WriteRawValue(lobjResult.ToJsonString)
+          Next
+          .WriteEndArray()
+
+          .WriteEndObject()
+
+          .WriteRaw("}")
+
+        End With
+      End Using
+
+      Return lobjStringBuilder.ToString
+
+    Catch ex As Exception
+      ApplicationLogging.LogException(ex, Reflection.MethodBase.GetCurrentMethod)
+      ' Re-throw the exception to the caller
+      Throw
+    End Try
+  End Function
+
 #End Region
 
 #Region "Private Methods"
