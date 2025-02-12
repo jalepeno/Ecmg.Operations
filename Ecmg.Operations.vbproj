@@ -10,7 +10,7 @@
     <PackageReadmeFile></PackageReadmeFile>
     <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
     <Title>Ecmg.Operations</Title>
-    <Version>1.0.17</Version>
+    <Version>1.0.18</Version>
     <PackageProjectUrl></PackageProjectUrl>
     <RepositoryUrl>https://github.com/jalepeno/Ecmg.Operations</RepositoryUrl>
     <PackageReleaseNotes>Added begin and complete events for process operations.</PackageReleaseNotes>

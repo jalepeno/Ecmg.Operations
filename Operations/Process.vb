@@ -1083,6 +1083,7 @@ Public Class Process
         lenuStepResult = lobjOperableStep.Execute(Me.WorkItem)
         RaiseEvent OperationComplete(Me, New OperableEventArgs(lobjOperableStep, WorkItem))
         If lenuStepResult = OperationEnumerations.Result.Failed Then
+          WorkItem.ProcessedStatus = ProcessedStatus.Failed
           If Not String.IsNullOrEmpty(lobjOperableStep.ProcessedMessage) Then
             Me.ProcessedMessage = lobjOperableStep.ProcessedMessage
             'LogSession.LogDebug("Process operation '{0}' failed ({1}).", lobjOperableStep.Name, lobjOperableStep.ProcessedMessage)
@@ -1100,6 +1101,21 @@ Public Class Process
       End If
 
       menuResult = lenuStepResult
+
+      Select Case menuResult
+        Case Result.Success
+          WorkItem.ProcessedStatus = ProcessedStatus.Success
+        Case Result.Failed
+          WorkItem.ProcessedStatus = ProcessedStatus.Failed
+        Case Result.PreviouslyFailed
+          WorkItem.ProcessedStatus = ProcessedStatus.PreviouslyFailed
+        Case Result.PreviouslySucceeded
+          WorkItem.ProcessedStatus = ProcessedStatus.PreviouslySucceeded
+        Case Else
+          WorkItem.ProcessedStatus = ProcessedStatus.Failed
+      End Select
+
+
 
       Return menuResult
 
