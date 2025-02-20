@@ -126,6 +126,7 @@ Public Class TransformOperation
     Try
 
       RunPreOperationChecks(True)
+      ' ApplicationLogging.LogInformation($"Transforming document '{WorkItem.SourceDocId}'")
 
       If Transformations Is Nothing OrElse Transformations.Count = 0 Then
         If Me.Parent IsNot Nothing Then

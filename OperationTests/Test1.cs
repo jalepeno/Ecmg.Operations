@@ -1,4 +1,5 @@
-﻿using Operations;
+﻿using Documents.Utilities;
+using Operations;
 using System.Reflection;
 
 namespace OperationTests
@@ -21,6 +22,9 @@ namespace OperationTests
 
       Process process = Process.FromXml(processXml);
 
+
+      process.RunAfterComplete = new ImportOperation();
+
       Console.WriteLine(process.ToString());
 
       string processJson = process.ToJson();
@@ -28,5 +32,16 @@ namespace OperationTests
       Console.WriteLine(processJson);
 
     }
+
+    [TestMethod]
+    public void OpenProcessFromJson()
+    {
+      string jsonPath = "G:\\Deloitte\\EDD\\Test Documents\\newProcess.json";
+      string processJson = Helper.ReadAllTextFromFile(jsonPath);
+      Process process = Process.CreateFromJson(processJson);
+      string readProcessJson = process.ToJson();
+
+    }
+
   }
 }

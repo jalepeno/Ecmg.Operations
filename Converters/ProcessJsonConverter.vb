@@ -72,6 +72,77 @@ Public Class ProcessJsonConverter
         Next
         .WriteEndArray()
 
+        If lobjProcess.RunBeforeBegin IsNot Nothing Then
+          .WritePropertyName("runBeforeBegin")
+          ' Write the operable element
+          .WriteRaw(lobjProcess.RunBeforeBegin.ToJson())
+        End If
+
+        If lobjProcess.RunAfterComplete IsNot Nothing Then
+          .WritePropertyName("runAfterComplete")
+          ' Write the operable element
+          .WriteStartArray()
+          .WriteRaw(lobjProcess.RunAfterComplete.ToJson())
+          .WriteEndArray()
+        End If
+
+        If lobjProcess.RunOnFailure IsNot Nothing Then
+          .WritePropertyName("runOnFailure")
+          ' Write the operable element
+          .WriteStartArray()
+          .WriteRaw(lobjProcess.RunOnFailure.ToJson())
+          .WriteEndArray()
+        End If
+
+        If lobjProcess.RunBeforeParentBegin IsNot Nothing Then
+          .WritePropertyName("runBeforeParentBegin")
+          ' Write the operable element
+          .WriteStartArray()
+          .WriteRaw(lobjProcess.RunBeforeParentBegin.ToJson())
+          .WriteEndArray()
+        End If
+
+        If lobjProcess.RunAfterParentComplete IsNot Nothing Then
+          .WritePropertyName("runAfterParentComplete")
+          ' Write the operable element
+          .WriteStartArray()
+          .WriteRaw(lobjProcess.RunAfterParentComplete.ToJson())
+          .WriteEndArray()
+        End If
+
+        If lobjProcess.RunOnParentFailure IsNot Nothing Then
+          .WritePropertyName("runOnParentFailure")
+          ' Write the operable element
+          .WriteStartArray()
+          .WriteRaw(lobjProcess.RunOnParentFailure.ToJson())
+          .WriteEndArray()
+        End If
+
+        If lobjProcess.RunBeforeJobBegin IsNot Nothing Then
+          .WritePropertyName("runBeforeJobBegin")
+          ' Write the operable element
+          .WriteStartArray()
+          .WriteRaw(lobjProcess.RunBeforeJobBegin.ToJson())
+          .WriteEndArray()
+        End If
+
+        If lobjProcess.RunAfterJobComplete IsNot Nothing Then
+          .WritePropertyName("runAfterJobComplete")
+          ' Write the operable element
+          .WriteStartArray()
+          .WriteRaw(lobjProcess.RunAfterJobComplete.ToJson())
+          .WriteEndArray()
+        End If
+
+        If lobjProcess.RunOnJobFailure IsNot Nothing Then
+          .WritePropertyName("runOnJobFailure")
+          ' Write the operable element
+          .WriteStartArray()
+          .WriteRaw(lobjProcess.RunOnJobFailure.ToJson())
+          .WriteEndArray()
+        End If
+
+
         .WriteEndObject()
         .WriteEndObject()
 
@@ -97,6 +168,8 @@ Public Class ProcessJsonConverter
       Dim lobjParameters As New Parameters
       Dim lobjProcess As IProcess
 
+      Dim lobjRunAfterComplete As IOperable
+
       While reader.Read
         Select Case reader.TokenType
           Case JsonToken.PropertyName
@@ -116,6 +189,24 @@ Public Class ProcessJsonConverter
                 lstrCurrentPropertyName = reader.Value
               Case "operations"
                 lstrCurrentPropertyName = reader.Value
+              Case "runBeforeBegin"
+                lstrCurrentPropertyName = reader.Value
+              Case "runAfterComplete"
+                lstrCurrentPropertyName = reader.Value
+              Case "runOnFailure"
+                lstrCurrentPropertyName = reader.Value
+              Case "runBeforeParentBegin"
+                lstrCurrentPropertyName = reader.Value
+              Case "runAfterParentComplete"
+                lstrCurrentPropertyName = reader.Value
+              Case "runOnParentFailure"
+                lstrCurrentPropertyName = reader.Value
+              Case "runBeforeJobBegin"
+                lstrCurrentPropertyName = reader.Value
+              Case "runAfterJobComplete"
+                lstrCurrentPropertyName = reader.Value
+              Case "runOnJobFailure"
+                lstrCurrentPropertyName = reader.Value
             End Select
 
           Case JsonToken.StartObject
@@ -129,7 +220,8 @@ Public Class ProcessJsonConverter
                 Else
                   Throw New InvalidOperationException()
                 End If
-
+              Case "runAfterComplete"
+                lobjRunAfterComplete = Operation.CreateFromJsonReader(reader)
             End Select
 
         End Select
@@ -140,6 +232,9 @@ Public Class ProcessJsonConverter
         .LogResult = lblnLogResult
         .Parameters.AddRange(lobjParameters)
         .Operations.AddRange(lobjOperations)
+        If lobjRunAfterComplete IsNot Nothing Then
+          .RunAfterComplete = lobjRunAfterComplete
+        End If
       End With
 
       Return lobjProcess

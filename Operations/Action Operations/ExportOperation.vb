@@ -384,6 +384,7 @@ Public Class ExportOperation
       'LogSession.EnterMethod(Helper.GetMethodIdentifier(Reflection.MethodBase.GetCurrentMethod))
 
       RunPreOperationChecks(False)
+      ' ApplicationLogging.LogInformation($"Exporting document '{WorkItem.SourceDocId}'")
 
       If String.IsNullOrEmpty(Me.DocumentId) Then
         Throw New DocumentReferenceNotSetException()

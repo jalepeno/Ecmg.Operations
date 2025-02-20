@@ -313,7 +313,7 @@ Public Class ImportOperation
     Try
 
       RunPreOperationChecks(False)
-
+      ' ApplicationLogging.LogInformation($"Importing document '{WorkItem.SourceDocId}'")
       ' <Modified by: Ernie at 2/14/2014-11:13:38 AM on machine: ERNIE-THINK>
       ' ''  Changed by Ernie Bahr on 1/19/2012
       ''Dim lobjImporter As IDocumentImporter = PrimaryConnection.Provider.GetInterface(ProviderClass.DocumentImporter)

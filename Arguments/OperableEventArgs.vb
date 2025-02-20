@@ -12,6 +12,7 @@
 
 #Region "Imports"
 
+Imports System.Reflection.Metadata.Ecma335
 Imports Documents.Utilities
 
 #End Region
@@ -80,11 +81,18 @@ Public Class OperableEventArgs
 
   Protected Friend Overridable Function DebuggerIdentifier() As String
     Try
+      Dim lstrIdentifier As String
       If Not String.IsNullOrEmpty(DocumentId) Then
-        Return String.Format("DocumentId={0}", DocumentId)
+        lstrIdentifier = $"DocumentId={DocumentId}"
+      ElseIf WorkItem IsNot Nothing Then
+        lstrIdentifier = $"{WorkItem.SourceDocId}: {Operation.Name} - {Operation.Result}"
+        If WorkItem.Document IsNot Nothing Then
+          lstrIdentifier = $"{lstrIdentifier} ({WorkItem.Document})"
+        End If
       Else
-        Return "OperationEventArgs"
+        lstrIdentifier = "OperationEventArgs"
       End If
+      Return lstrIdentifier
     Catch ex As Exception
       ApplicationLogging.LogException(ex, Reflection.MethodBase.GetCurrentMethod)
       ' Re-throw the exception to the caller

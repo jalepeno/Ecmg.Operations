@@ -34,4 +34,8 @@ Public Interface IProcess
   ' Rollback Support
   Property AutoRollback As Boolean
 
+  Event OperationBegin As EventHandler(Of OperableEventArgs)
+  Event OperationComplete As EventHandler(Of OperableEventArgs)
+  Event OperationError As EventHandler(Of OperableErrorEventArgs)
+
 End Interface
