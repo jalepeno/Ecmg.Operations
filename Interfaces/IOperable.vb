@@ -118,7 +118,7 @@ Public Interface IOperable
   ''' </summary>
   ''' <returns></returns>
   ''' <remarks></remarks>
-  Function Execute(ByVal lpWorkItem As IWorkItem) As Result
+  Function Execute(ByRef lpWorkItem As IWorkItem) As Result
 
 
 

@@ -956,7 +956,7 @@ Public Class Process
   ''' </summary>
   ''' <returns></returns>
   ''' <remarks></remarks>
-  Public Function Execute(ByVal lpWorkItem As IWorkItem) As OperationEnumerations.Result Implements IOperable.Execute
+  Public Function Execute(ByRef lpWorkItem As IWorkItem) As OperationEnumerations.Result Implements IOperable.Execute
     Try
 
       'LogSession.EnterMethod(Level.Debug, Helper.GetMethodIdentifier(Reflection.MethodBase.GetCurrentMethod))
@@ -982,6 +982,12 @@ Public Class Process
         If lenuRunAfterCompleteResult = OperationEnumerations.Result.Failed Then
           OnError(New OperableErrorEventArgs(Me, lpWorkItem, lpWorkItem.ProcessedMessage))
         End If
+      End If
+
+      ' Make sure we dispose of the document attachment to release any associated memory
+      If Me.WorkItem IsNot Nothing AndAlso Me.WorkItem.Document IsNot Nothing AndAlso Me.WorkItem.Document.IsDisposed = False Then
+        Me.WorkItem.Document.Dispose()
+        Me.WorkItem.Document = Nothing
       End If
 
     Catch ex As Exception
@@ -1090,6 +1096,7 @@ Public Class Process
           Else
             'LogSession.LogDebug("Process operation '{0}' failed with no message.", lobjOperableStep.Name)
           End If
+          RaiseEvent OperationError(Me, New OperableErrorEventArgs(lobjOperableStep, WorkItem, lobjOperableStep.ProcessedMessage))
           ' Execute the RunOnFailure operation(s)
           lobjOperableStep.RunOnFailure?.Execute(Me.WorkItem)
           Exit For
@@ -1406,12 +1413,6 @@ Public Class Process
       End If
 
       WorkItem.ProcessedBy = Environment.MachineName
-
-      ' Make sure we dispose of the document attachment to release any associated memory
-      If Me.WorkItem IsNot Nothing AndAlso Me.WorkItem.Document IsNot Nothing AndAlso Me.WorkItem.Document.IsDisposed = False Then
-        Me.WorkItem.Document.Dispose()
-        Me.WorkItem.Document = Nothing
-      End If
 
       RaiseEvent Complete(Me, e)
 

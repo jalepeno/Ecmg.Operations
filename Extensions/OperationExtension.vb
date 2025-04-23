@@ -801,7 +801,7 @@ Namespace Extensions
     ''' </summary>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Function Execute(ByVal lpWorkItem As IWorkItem) As OperationEnumerations.Result Implements IOperation.Execute
+    Public Function Execute(ByRef lpWorkItem As IWorkItem) As OperationEnumerations.Result Implements IOperation.Execute
       Try
 
         'LogSession.EnterMethod(Level.Debug, Helper.GetMethodIdentifier(Reflection.MethodBase.GetCurrentMethod))
